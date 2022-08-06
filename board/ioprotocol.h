@@ -1,5 +1,4 @@
-#ifndef __IO_PROTOCOL_H__
-#define __IO_PROTOCOL_H__
+#pragma once
 
 /**
  * @brief ioctl系统调用功能码.
@@ -21,5 +20,3 @@ enum iocmd {
     IO_GET_TMP_AND_HUM,     //获取温湿度
     IO_SET_DIGITUBE,        //设置数码管显示数值
 };
-
-#endif

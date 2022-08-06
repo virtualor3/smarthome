@@ -1,12 +1,12 @@
+ARCH ?= arm
+MODENAME ?= 
+TARGETDIR ?= ~/nfs/rootfs/devtest/
+
 ifneq ($(KERNELRELEASE),)
 #驱动多文件编译
 	obj-m := $(MODENAME).o
 	$(MODENAME)-obj := $(SOURCES)
 else
-	ARCH ?= arm
-	MODENAME ?= 
-	TARGETDIR ?= ~/nfs/rootfs/devtest/
-	
 	ifeq ($(ARCH),arm)
  		KERNELDIR := /home/virtualor3/linux-5.10
 		CROSS_COMPILE ?= arm-linux-gnueabihf-
