@@ -13,7 +13,6 @@ int smarthome_close(struct inode *inode, struct file *filp)
 
 long smarthome_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
-    _IOC_NR()
 }
 
 ssize_t smarthome_read(struct file *filp, char __user *mem, size_t size, loff_t *off)
