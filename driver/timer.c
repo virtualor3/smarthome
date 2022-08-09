@@ -8,11 +8,13 @@
 
 struct timer_list timer;
 struct work_struct work;
+uint32_t temperature;
+
 #define TIME_NSEC 200
 
 void work_handler(struct work_struct* work)
 {
-    if (read_temperature() > get_temp_threshold()) {
+    if ((temperature = read_temperature()) > get_temp_threshold()) {
         fan_start();
         buzz_on();
     } else {
