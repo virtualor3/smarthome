@@ -56,3 +56,4 @@ extern void digitube_init(void);
 extern void temphum_delinit(void);
 extern void pwm_delinit(void);
 extern void digitube_delinit(void);
+extern void irq_delinit(void);
