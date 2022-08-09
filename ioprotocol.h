@@ -1,7 +1,7 @@
 /**
  * @file ioprotocol.h
  * @author your name (you@domain.com)
- * @brief 开发板ioctl功能码
+ * @brief 开发板ioctl功能码，应用application和驱动driver公有
  * @version 0.1
  * @date 2022-08-09
  * 

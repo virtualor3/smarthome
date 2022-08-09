@@ -1,6 +1,17 @@
+/**
+ * @file smartdriver.h
+ * @author your name (you@domain.com)
+ * @brief 驱动的公共头文件
+ * @version 0.1
+ * @date 2022-08-09
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #pragma once
 
 #include <stdint.h>
+#include "ioprotocol.h"
 
 //温湿度读取
 // return - uint32_t: 温度低16位、湿度高16位
@@ -24,15 +35,15 @@ extern uint32_t led_status(void);
 //电机
 extern void motor_start(void);
 extern void motor_stop(void);
-extern uint32_t motor_status(void);
+extern uint32_t motor_status(void); //获取motor状态，状态宏在ioprotocol.h中
 //蜂鸣器
 extern void buzz_on(void);
 extern void buzz_off(void);
-extern uint32_t buzz_status(void);
+extern uint32_t buzz_status(void);  //获取buzz状态
 //风扇
 extern void fan_start(void);
 extern void fan_stop(void);
-extern uint32_t fan_status(void);
+extern uint32_t fan_status(void);   //获取fan状态
 //数码管显示
 extern void digitube_display(uint32_t);
 
