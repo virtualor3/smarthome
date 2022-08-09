@@ -8,4 +8,6 @@
  * @copyright Copyright (c) 2022
  * 
  */
-#include <linux/pwm.h>
+
+//不要用注册file_operation
+//实现smartdriver.h里的功能函数就行
