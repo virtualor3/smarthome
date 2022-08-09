@@ -26,8 +26,8 @@
 #include <linux/module.h>
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
-#include <linux/of_irq.h>
-#include <linux/interrupt.h>
+// #include <linux/of_irq.h>
+// #include <linux/interrupt.h>
 #include <linux/of.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
@@ -45,31 +45,31 @@
     motor = <&gpiof 6 0>;
 };*/
 #define CNAME "pwm"
-int status = 0;                               // 中断电平切换
-int irqno;                                    //中断号
+#define PWM_PATH_NAME "/myplatform"
+// int status = 0;                               // 中断电平切换
+// int irqno;                                    //中断号
 char *gpioname[3] = {"fan", "buzz", "motor"}; //设备树的键
 struct device_node *node;
 struct gpio_desc *desc[3]; //[0]fan [1]buzz [2]motor
-wait_queue_head_t wq;
 
-//中断
-irqreturn_t pwm_irq(int irq, void *dev)
-{
-    int i = 0;
-    //唤醒
-    wake_up_interruptible(&wq);
-    //按键中断停止运行
-    for (i = 0; i < 3; i++)
-    {
-        status = gpiod_get_value(desc[i]);
-        if (status == 1)
-        {
-            status = !status;
-            gpiod_set_value(desc[i], status);
-        }
-    }
-    return IRQ_HANDLED;
-}
+// //中断
+// irqreturn_t pwm_irq(int irq, void *dev)
+// {
+//     int i = 0;
+//     //唤醒
+//     wake_up_interruptible(&wq);
+//     //按键中断停止运行
+//     for (i = 0; i < 3; i++)
+//     {
+//         status = gpiod_get_value(desc[i]);
+//         if (status == 1)
+//         {
+//             status = !status;
+//             gpiod_set_value(desc[i], status);
+//         }
+//     }
+//     return IRQ_HANDLED;
+// }
 
 //电机
 void motor_start(void)
@@ -119,7 +119,7 @@ void pwm_init(void)
     int ret, i = 0;
     printk("%s:%s:%d\n", __FILE__, __func__, __LINE__);
     // 1.获取结点
-    node = of_find_node_by_path("/myplatform");
+    node = of_find_node_by_path(PWM_PATH_NAME);
     if (node == NULL)
     {
         printk("get device node error\n");
@@ -138,27 +138,23 @@ void pwm_init(void)
         }
         gpiod_set_value(desc[i], 0); // pwm相关保持低电平
     }
-    // 3.获取软中断号、注册中断
-    irqno = irq_of_parse_and_map(node, 0);
-    if (irqno == 0)
-    {
-        printk("parse irqno error\n");
-        return -EAGAIN;
-        goto ERR3;
-    }
-    ret = request_irq(irqno, pwm_irq, IRQF_TRIGGER_FALLING, CNAME, NULL);
-    if (ret)
-    {
-        printk("request irq error\n");
-        goto ERR4;
-    }
-
-    // 4.初始化等待队列头
-    init_waitqueue_head(&wq);
-
+//     // 3.获取软中断号、注册中断
+//     irqno = irq_of_parse_and_map(node, 0);
+//     if (irqno == 0)
+//     {
+//         printk("parse irqno error\n");
+//         return -EAGAIN;
+//         goto ERR3;
+//     }
+//     ret = request_irq(irqno, pwm_irq, IRQF_TRIGGER_FALLING, CNAME, NULL);
+//     if (ret)
+//     {
+//         printk("request irq error\n");
+//         goto ERR4;
+//     }
     return 0;
-ERR4:
-    free_irq(irqno, NULL);
+// ERR4:
+//     free_irq(irqno, NULL);
 ERR3:
     gpiod_put(desc);
 ERR2:
@@ -173,7 +169,7 @@ ERR1:
 void pwm_delinit(void)
 {
     int i = 0;
-    free_irq(irqno, NULL);
+//     free_irq(irqno, NULL);
     gpiod_put(desc);
     for (i = 0; i < 3; i++)
     {
