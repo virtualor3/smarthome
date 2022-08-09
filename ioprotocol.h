@@ -31,3 +31,15 @@ enum iocmd {
     IO_GET_TMP_AND_HUM,     //获取温湿度
     IO_SET_DIGITUBE,        //设置数码管显示数值
 };
+
+#define LED_OFF         0
+#define LED_ON          1
+
+#define MOTOR_STOP      0
+#define MOTOR_START     1
+
+#define BUZZ_OFF        0
+#define BUZZ_ON         1
+
+#define FAN_STOP        0
+#define FAN_START       1
