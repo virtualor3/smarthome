@@ -29,6 +29,7 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
         [IO_FAN_STOP] = fan_stop,
     };
     if(_IOC_NR(cmd) < ARRAY_SIZE(callzu)) callzu[_IOC_NR(cmd)]();
+    return 0;
 }
 
 ssize_t smarthome_read(struct file* filp, char __user* mem, size_t size, loff_t* off)
@@ -54,6 +55,7 @@ static int __init smarthome_init(void)
     pwm_init();
     temphum_init();
     digitube_init();
+    return 0;
 }
 
 static void __exit smarthome_exit(void)
