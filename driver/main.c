@@ -1,9 +1,20 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/fs.h>
+#include <linux/cdev.h>
+#include <linux/device.h>
+#include <linux/slab.h>
 
 #include "smartdriver.h"
-#include "../ioprotocol.h"
+#include "ioprotocol.h"
+
+struct cdev* cdev;
+struct class* cls;
+struct device* device;
+
+dev_t devno = MKDEV(0, 0);
+
+#define CNAME "smarthome"
 
 int smarthome_open(struct inode* inode, struct file* filp)
 {
@@ -17,6 +28,7 @@ int smarthome_close(struct inode* inode, struct file* filp)
 
 long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
 {
+    uint32_t ret = 0;
     typedef void(*pfunc_t)(void);
     static const pfunc_t callzu[] = {
         [IO_LED_ON] = led_on,
@@ -33,13 +45,12 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
         callzu[_IOC_NR(cmd)]();
         return 0;
     }
-    uint32_t ret = 0;
     switch (_IOC_NR(cmd)) {
-        case IO_GET_TMP_THRESHOLD:  ret = get_temp_threshold();
+        case IO_GET_TMP_THRESHOLD:  ret = get_temp_threshold(); break;
         case IO_SET_TMP_THRESHOLD:  set_temp_threshold((uint32_t)arg); break;
         case IO_GET_TMP:            ret = temperature; break;
         case IO_GET_HUM:            ret = humidity; break;
-        case IO_GET_TMP_AND_HUM:    ret = temperature | (humidity << 16); break;
+        case IO_GET_TMP_AND_HUM:    ret = SET_TEMPHUM(temperature, humidity); break;
         case IO_SET_DIGITUBE:       digitube_display((uint32_t)arg); break;
         default:                    printk("IOCTL cmdcode err!\n"); ret = -1;
     }
@@ -70,6 +81,22 @@ static int __init smarthome_init(void)
     pwm_init();
     temphum_init();
     digitube_init();
+
+    cdev = cdev_alloc();
+    cdev_init(cdev, &fops);
+    alloc_chrdev_region(&devno, MINOR(devno), 1, CNAME);
+    cdev_add(cdev, devno, 1);
+
+    cls = class_create(THIS_MODULE, CNAME);
+    if (IS_ERR(cls)) {
+        printk("create class failed\n");
+        return PTR_ERR(cls);
+    }
+    device = device_create(cls, NULL, devno, NULL, CNAME);
+    if (IS_ERR(device)) {
+        printk("create device failed\n");
+        return PTR_ERR(device);
+    }
     return 0;
 }
 
@@ -79,6 +106,12 @@ static void __exit smarthome_exit(void)
     pwm_delinit();
     temphum_delinit();
     digitube_delinit();
+
+    device_destroy(cls, devno);
+    class_destroy(cls);
+    cdev_del(cdev);
+    unregister_chrdev_region(devno, 1);
+    kfree(cdev);
 }
 
 module_init(smarthome_init);

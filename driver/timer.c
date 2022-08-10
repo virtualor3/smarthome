@@ -1,18 +1,19 @@
 #include <linux/init.h>
 #include <linux/of.h>
-#include <linux/irq.h>
+#include <linux/workqueue.h>
 #include <linux/timer.h>
 
 #include "smartdriver.h"
-#include "../ioprotocol.h"
+#include "ioprotocol.h"
 
-struct timer_list timer;
-struct work_struct work;
+static struct timer_list timer;
+static struct work_struct alarm_work;
 
 #define TIME_NSEC 200
 
-void work_handler(struct work_struct* work)
+static void alarm_work_handler(struct work_struct* work)
 {
+    humidity = read_humidity();
     if ((temperature = read_temperature()) > get_temp_threshold()) {
         fan_start();
         buzz_on();
@@ -22,16 +23,16 @@ void work_handler(struct work_struct* work)
     }
 }
 
-void timer_handler(struct timer_list* timer)
+static void timer_handler(struct timer_list* timer)
 {
-    schedule_work(&work);
-    mod_timer(timer, jiffies + TIME_NSEC / HZ);
+    schedule_work(&alarm_work);
+    mod_timer(timer, jiffies + HZ * TIME_NSEC / 1000);
 }
 
 void timer_init(void)
 {
-    INIT_WORK(&work, work_handler);
-    timer.expires = jiffies + TIME_NSEC / HZ;
+    INIT_WORK(&alarm_work, alarm_work_handler);
+    timer.expires = jiffies + HZ * TIME_NSEC / 1000;
     timer_setup(&timer, timer_handler, 0);
     add_timer(&timer);
 }

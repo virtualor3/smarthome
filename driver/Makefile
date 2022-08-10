@@ -1,6 +1,7 @@
 #驱动.o文件
-# DRIVERSOURCES ?= $(wildcard *.c)
+DRIVERSOURCES ?= $(notdir $(wildcard $(src)/*.c))
 #驱动多文件编译
 obj-m := $(MODENAME).o
-# $(MODENAME)-objs := $(patsubst %.c,%.o,$(DRIVERSOURCES))
-$(MODENAME)-objs := pwm.o main.o temphum.o timer.o
+$(MODENAME)-objs := $(patsubst %.c,%.o,$(DRIVERSOURCES))
+#指定自定义头文件路径
+ccflags-y += -I$(src)/../

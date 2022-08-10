@@ -33,7 +33,7 @@
 #include <linux/uaccess.h>
 
 #include "smartdriver.h"
-#include "../protocol.h"
+#include "protocol.h"
 //设备树
 /*myplatform{
     compatible = "hqyj,myplatform";
