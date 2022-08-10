@@ -18,7 +18,7 @@ int smarthome_close(struct inode* inode, struct file* filp)
 long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
 {
     typedef void(*pfunc_t)(void);
-    static pfunc_t callzu[] = {
+    static const pfunc_t callzu[] = {
         [IO_LED_ON] = led_on,
         [IO_LED_OFF] = led_off,
         [IO_LED_TOGGLE] = led_toggle,
@@ -39,9 +39,11 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
         case IO_SET_TMP_THRESHOLD:  set_temp_threshold((uint32_t)arg); break;
         case IO_GET_TMP:            ret = temperature; break;
         case IO_GET_HUM:            ret = humidity; break;
-        case IO_GET_TMP_AND_HUM:    ret = temperature; break;
+        case IO_GET_TMP_AND_HUM:    ret = temperature | (humidity << 16); break;
+        case IO_SET_DIGITUBE:       digitube_display((uint32_t)arg); break;
+        default:                    printk("IOCTL cmdcode err!\n"); ret = -1;
     }
-    return 0;
+    return ret;
 }
 
 ssize_t smarthome_read(struct file* filp, char __user* mem, size_t size, loff_t* off)
@@ -64,6 +66,7 @@ struct file_operations fops = {
 
 static int __init smarthome_init(void)
 {
+    timer_init();
     pwm_init();
     temphum_init();
     digitube_init();
@@ -72,6 +75,7 @@ static int __init smarthome_init(void)
 
 static void __exit smarthome_exit(void)
 {
+    timer_delinit();
     pwm_delinit();
     temphum_delinit();
     digitube_delinit();

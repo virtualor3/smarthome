@@ -47,11 +47,13 @@ extern uint32_t fan_status(void);   //获取fan状态
 extern void digitube_display(uint32_t);
 
 //初始化
+extern void timer_init(void);
 extern void temphum_init(void);
 extern void pwm_init(void);
 extern void digitube_init(void);
 
 //卸载delinit
+extern void timer_delinit(void);
 extern void temphum_delinit(void);
 extern void pwm_delinit(void);
 extern void digitube_delinit(void);

@@ -35,3 +35,8 @@ void timer_init(void)
     timer_setup(&timer, timer_handler, 0);
     add_timer(&timer);
 }
+
+void timer_delinit(void)
+{
+    del_timer(&timer);
+}
