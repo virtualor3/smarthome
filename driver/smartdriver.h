@@ -55,5 +55,5 @@ extern void inline pwm_delinit(void);
 extern void inline digitube_delinit(void);
 extern void inline irq_delinit(void);
 
-uint32_t temperature;   //温度
-uint32_t humidity;      //湿度
+extern uint32_t temperature;   //温度
+extern uint32_t humidity;      //湿度
