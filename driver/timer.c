@@ -4,7 +4,7 @@
 #include <linux/timer.h>
 
 #include "smartdriver.h"
-#include "ioprotocol.h"
+#include "../ioprotocol.h"
 
 struct timer_list timer;
 struct work_struct work;

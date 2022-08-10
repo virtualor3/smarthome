@@ -3,7 +3,7 @@
 #include <linux/fs.h>
 
 #include "smartdriver.h"
-#include "ioprotocol.h"
+#include "../ioprotocol.h"
 
 int smarthome_open(struct inode* inode, struct file* filp)
 {}
