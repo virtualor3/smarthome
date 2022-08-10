@@ -10,7 +10,6 @@
  */
 #pragma once
 
-#include <stdint.h>
 #include "ioprotocol.h"
 
 struct msg {

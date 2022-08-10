@@ -6,10 +6,14 @@
 #include "../ioprotocol.h"
 
 int smarthome_open(struct inode* inode, struct file* filp)
-{}
+{
+    return 0;
+}
 
 int smarthome_close(struct inode* inode, struct file* filp)
-{}
+{
+    return 0;
+}
 
 long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
 {
@@ -28,10 +32,14 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
 }
 
 ssize_t smarthome_read(struct file* filp, char __user* mem, size_t size, loff_t* off)
-{}
+{
+    return size;
+}
 
 ssize_t smarthome_write(struct file* filp, const char __user* mem, size_t size, loff_t* off)
-{}
+{
+    return size;
+}
 // 定义操作方法结构体的变量，并对成员进行初始化
 struct file_operations fops = {
     .open = smarthome_open,
@@ -48,7 +56,7 @@ static int __init smarthome_init(void)
     digitube_init();
 }
 
-static int __exit smarthome_exit(void)
+static void __exit smarthome_exit(void)
 {
     pwm_delinit();
     temphum_delinit();

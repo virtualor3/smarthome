@@ -9,9 +9,9 @@
  * 
  */
 #pragma once
-#include <stdint.h>
+#include <linux/types.h>
 #include "../ioprotocol.h"
-typedef unsigned int uint32_t;
+// typedef unsigned int uint32_t;
 //温湿度读取
 // return - uint32_t: 温度低16位、湿度高16位
 extern uint32_t read_temperature_humidity(void);

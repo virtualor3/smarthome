@@ -150,7 +150,7 @@ void pwm_init(void)
     //         printk("request irq error\n");
     //         goto ERR4;
     //     }
-    return 0;
+    return;
     // ERR4:
     //     free_irq(irqno, NULL);
 ERR2:
