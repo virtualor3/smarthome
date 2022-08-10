@@ -18,6 +18,7 @@
 enum iocmd {
     IO_LED_ON,              //led开启
     IO_LED_OFF,             //led关闭
+    IO_LED_TOGGLE,
     IO_MOTOR_START,         //电机启动
     IO_MOTOR_STOP,          //电机停止
     IO_BUZZ_ON,             //蜂鸣器开启
@@ -31,6 +32,19 @@ enum iocmd {
     IO_GET_TMP_AND_HUM,     //获取温湿度
     IO_SET_DIGITUBE,        //设置数码管显示数值
 };
+
+struct temphum {
+    uint16_t temp;          //温度
+    uint16_t hum;           //湿度
+};
+
+#define SET_DIGITNUM(num, decimal)  ((num & 0xffffff) | (decimal << 24))    //设置ioctl传参,IO_SET_DIGITUBE
+#define GET_DIGITNUM(x)             (x & 0xffffff)                          //从ioctl参数arg获取显示的数字
+#define GET_DIGITDEC(x)             (x >> 24)                               //从ioctl参数arg获取小数位数
+
+#define SET_TEMPHUM(temp, hum)  ((hum << 16) | (temp & 0xffff))    //设置ioctl传参,IO_GET_TMP_AND_HUM
+#define GET_TEMP(x)             (x & 0xffff)    //从ioctl返回值获取温度
+#define GET_HUM(x)              (x >> 16)       //从ioctl返回值获取湿度
 
 #define LED_OFF         0
 #define LED_ON          1
