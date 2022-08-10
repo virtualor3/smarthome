@@ -56,3 +56,6 @@ extern void temphum_delinit(void);
 extern void pwm_delinit(void);
 extern void digitube_delinit(void);
 extern void irq_delinit(void);
+
+uint32_t temperature;   //温度
+uint32_t humidity;      //湿度

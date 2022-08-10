@@ -21,6 +21,7 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
     static pfunc_t callzu[] = {
         [IO_LED_ON] = led_on,
         [IO_LED_OFF] = led_off,
+        [IO_LED_TOGGLE] = led_toggle,
         [IO_MOTOR_START] = motor_start,
         [IO_MOTOR_STOP] = motor_stop,
         [IO_BUZZ_ON] = buzz_on,
@@ -28,7 +29,18 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
         [IO_FAN_START] = fan_start,
         [IO_FAN_STOP] = fan_stop,
     };
-    if(_IOC_NR(cmd) < ARRAY_SIZE(callzu)) callzu[_IOC_NR(cmd)]();
+    if (_IOC_NR(cmd) < ARRAY_SIZE(callzu)) {
+        callzu[_IOC_NR(cmd)]();
+        return 0;
+    }
+    uint32_t ret = 0;
+    switch (_IOC_NR(cmd)) {
+        case IO_GET_TMP_THRESHOLD:  ret = get_temp_threshold();
+        case IO_SET_TMP_THRESHOLD:  set_temp_threshold((uint32_t)arg); break;
+        case IO_GET_TMP:            ret = temperature; break;
+        case IO_GET_HUM:            ret = humidity; break;
+        case IO_GET_TMP_AND_HUM:    ret = temperature; break;
+    }
     return 0;
 }
 

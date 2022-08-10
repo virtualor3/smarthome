@@ -8,7 +8,6 @@
 
 struct timer_list timer;
 struct work_struct work;
-uint32_t temperature;
 
 #define TIME_NSEC 200
 
