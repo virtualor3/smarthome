@@ -9,7 +9,7 @@
  * 
  */
 #pragma once
-
+#include <stdint.h>
 #include "../ioprotocol.h"
 typedef unsigned int uint32_t;
 //温湿度读取
