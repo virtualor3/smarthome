@@ -57,7 +57,7 @@ static const u8 which[] = {
 static struct digitubeinfo
 {
     uint8_t digitube_char[4];  //4位数码管数值
-    uint8_t decimal_places;     //数码管小数显示位置
+    uint8_t decimal_places;     //数码管小数位数
 } digitube_info;
 
 void digitube_display(uint32_t num)
