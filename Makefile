@@ -9,7 +9,7 @@ export APPNAME ?= smarthomeapp
 INSTALLDIR ?= ~/nfs/rootfs/
 
 ifeq ($(ARCH),arm)
- 	KERNELDIR := /home/virtualor3/linux-5.4.31
+ 	KERNELDIR := /home/ubuntu/FSMP1A/linux/linux-5.10.61
 	CROSS_COMPILE ?= arm-linux-gnueabihf-
 else
  	KERNELDIR := /lib/modules/$(shell uname -r)/build

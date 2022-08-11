@@ -185,7 +185,7 @@ struct i2c_driver si7006 = {
 
 void temphum_init(void)
 {
-    i2c_add_driver(si7006);
+    i2c_add_driver(&si7006);
 }
 
 void temphum_delinit(void)
