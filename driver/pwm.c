@@ -121,6 +121,7 @@ void pwm_init(void)
         }
         gpiod_set_value(desc[i], 0); // pwm相关保持低电平
     }
+    return 0;
 ERR2:
     for (i = 0; i < 3; i++) {
         gpiod_put(desc[i]);
