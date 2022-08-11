@@ -6,6 +6,8 @@
 #include "smartdriver.h"
 #include "ioprotocol.h"
 
+uint32_t temperature;   //温度
+uint32_t humidity;      //湿度
 static struct timer_list timer;
 static struct work_struct alarm_work;
 

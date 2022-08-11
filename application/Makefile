@@ -1,4 +1,4 @@
-cflags := -wall -O2
+cflags := -Wall -O2
 #开发板应用程序.o文件
 APPSOURCES := $($(wildcard *.c):%.c=%.o)
 

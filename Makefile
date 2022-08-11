@@ -1,4 +1,4 @@
-ARCH ?= arm
+ARCH ?= $(shell uname -m)
 #当前文件目录
 PWD := $(shell pwd)
 #驱动模块目标文件名<modename>.ko

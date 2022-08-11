@@ -36,7 +36,6 @@
 #define CNAME "si7006"
 
 static struct i2c_client* gclient;
-
 static int temp;
 static spinlock_t lock;
 
@@ -56,7 +55,7 @@ uint32_t get_temp_threshold(void)
 uint32_t read_temperature(void)
 {
     int ret;
-    unsigned char r_buf[] = { 0xE3 };
+    unsigned char r_buf[] = { TMP_ADDR };
     unsigned short data;
 
     // 1.封装消息
@@ -88,7 +87,7 @@ uint32_t read_temperature(void)
 uint32_t read_temperature_humidity(void)
 {
     int ret;
-    unsigned char r_buf[] = { 0xE3 };
+    unsigned char r_buf[] = { TMP_ADDR };
     unsigned char data[4];
     unsigned int  data_return = 0;
 
@@ -124,7 +123,7 @@ uint32_t read_temperature_humidity(void)
 uint32_t read_humidity(void)
 {
     int ret;
-    unsigned char r_buf[] = { 0xE5 };
+    unsigned char r_buf[] = { HUM_ADDR };
     unsigned short data;
 
     // 1.封装消息
