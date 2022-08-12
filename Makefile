@@ -1,31 +1,25 @@
-ARCH ?= arm
+ARCH ?= $(shell uname -m)
+#当前文件目录
+PWD := $(shell pwd)
 #驱动模块目标文件名<modename>.ko
-MODENAME ?= smarthome
+export MODENAME ?= smarthome
 #开发板应用程序目标文件名<filename>.out
-APPNAME ?= smarthome
+export APPNAME ?= smarthomeapp
 #目标安装目录
 INSTALLDIR ?= ~/nfs/rootfs/
+#内核源码目录
+KERNELDIR ?= /home/virtualor3/linux-5.10.61
 
-#驱动.o文件
-DRIVERSOURCES ?= $(wildcard drivers/*.c)
-#开发板应用程序.o文件
-APPSOURCES ?= $(wildcard application/*.c)
+DTBNAME ?= stm32mp157a-fsmp1a
 
-ifneq ($(KERNELRELEASE),)
-#驱动多文件编译
-	obj-m := $(MODENAME).o
-	$(MODENAME)-obj := $(SOURCES)
+ifeq ($(ARCH),arm)
+	CROSS_COMPILE ?= arm-linux-gnueabihf-
 else
-	ifeq ($(ARCH),arm)
- 		KERNELDIR := /home/virtualor3/linux-5.10
-		CROSS_COMPILE ?= arm-linux-gnueabihf-
-	else
- 		KERNELDIR := /lib/modules/$(shell uname -r)/build
- 		CROSS_COMPILE ?=
-	endif
+ 	KERNELDIR := /lib/modules/$(shell uname -r)/build
+ 	CROSS_COMPILE ?=
+endif
 
-	PWD := $(shell pwd)
-	CC := $(CROSS_COMPILE)gcc
+CC := $(CROSS_COMPILE)gcc
 
 #全部编译
 all:driver app
@@ -35,22 +29,22 @@ driver:$(MODENAME)
 app:$(APPNAME)
 
 $(MODENAME):
-	make -C $(KERNELDIR)  M=$(PWD)  modules
+	@make -C $(KERNELDIR)  M=$(PWD)/driver  $(MODENAME).ko
 
-$(APPNAME):$(APPSOURCES)
-	CC $^ -I./ -o $@
+$(APPNAME):
+	@make -C $(PWD)/application all
+
+.PHONY = clean install
 
 install:
-	-cp $(MODENAME).ko	$(INSTALLDIR)
-	-cp $(APPNAME)	$(INSTALLDIR)
+	cp driver/$(MODENAME).ko	$(INSTALLDIR) 2> /dev/null
+	cp application/$(APPNAME)	$(INSTALLDIR) 2> /dev/null
 
 clean:
-	make -C $(KERNELDIR)  M=$(PWD)  clean
-	rm $(APPNAME)
+	@make -C $(KERNELDIR)  M=$(PWD)/driver  clean
+	@make -C $(PWD)/application clean 2> /dev/null
 
 help:
 	@echo "make ARCH=<arm or x86> MODENAME=<drivers filename> driver"
 	@echo "make ARCH=<arm or x86> APPNAME=<app filename> app"
 	@echo "make ARCH=<arm or x86> APPNAME=<app filename> MODENAME=<driver filename> all"
-
-endif
