@@ -117,6 +117,7 @@ void led_init(void)
         printk("request irq error\n");
         goto ERR4;
     }
+    return;
 ERR4:
     free_irq(irqno, NULL);
 ERR3:
