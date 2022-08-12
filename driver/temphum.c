@@ -36,20 +36,20 @@
 #define CNAME "si7006"
 
 static struct i2c_client* gclient;
-static int temp;
+static int temp_threshold;
 static spinlock_t lock;
 
 void set_temp_threshold(uint32_t buf)
 {
     //临界区
     spin_lock(&lock);
-    temp = buf;
+    temp_threshold = buf;
     spin_unlock(&lock);
 }
 
 uint32_t get_temp_threshold(void)
 {
-    return temp;
+    return temp_threshold;
 }
 
 uint32_t read_temperature(void)

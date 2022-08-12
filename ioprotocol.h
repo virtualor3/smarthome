@@ -33,14 +33,24 @@ enum iocmd {
     IO_SET_DIGITUBE,        //设置数码管显示数值
 };
 
+#include <linux/ioctl.h>
+#define IOW(nr) _IOW('s', (nr), uint32_t)
+
 struct temphum {
     uint16_t temp;          //温度
     uint16_t hum;           //湿度
 };
 
-#define SET_DIGITNUM(num, decimal)  ((num & 0xffffff) | (decimal << 24))    //设置ioctl传参,IO_SET_DIGITUBE
-#define GET_DIGITNUM(x)             (x & 0xffffff)                          //从ioctl参数arg获取显示的数字
-#define GET_DIGITDEC(x)             (x >> 24)                               //从ioctl参数arg获取小数位数
+/**
+ * 设置ioctl传参,IO_SET_DIGITUBE
+ * @neg: bool - 符号位 (1:负数 0:正数)
+ * @num: uint - 数码管将要显示的数字显示的数字
+ * @decimal: uint - 小数点后小数位数
+**/
+#define SET_DIGITNUM(neg, num, decimal)  (((neg) << 31) | ((num) & 0xffffff) | (((decimal) & 0x7f) << 24))
+#define GET_DIGITNUM(x)                  ((x) & 0xffffff)                          //从ioctl参数arg获取显示的数字
+#define GET_DIGITDEC(x)                  (((x) >> 24) & 0x7f)                      //从ioctl参数arg获取小数位数
+#define GET_DIGITNEG(x)                  ((x) >> 31)
 
 #define SET_TEMPHUM(temp, hum)  ((hum << 16) | (temp & 0xffff))    //设置ioctl传参,IO_GET_TMP_AND_HUM
 #define GET_TEMP(x)             (x & 0xffff)    //从ioctl返回值获取温度

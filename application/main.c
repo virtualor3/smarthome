@@ -25,20 +25,11 @@ static pfunc_t zufunc[] = {
 int main(int argc, char const* argv[])
 {
     int ret;
-    char buf[8] = { 0 };
-
     int fd = open(DEVNAME, O_RDWR);
-    printf("\ec"MAIN_MENU"input(1~8)>>");
-    fflush(stdout);
-    do {
-        fgets(buf, sizeof(buf), stdin);
-        if (buf[6] != '\n') {
-            while (getchar() != '\n');
-        }
-        if ((ret = buf[0] - '0' - 1) & (~0x7) == 0) break;
-        printf("input(1~8)>>");
-        fflush(stdout);
-    } while (1);
-    zufunc[ret](fd);
+    while (1) {
+        printf("\ec"MAIN_MENU);
+        ret = get_inputi(1, 8, "input(1~8)>>");
+        zufunc[ret - 1](fd);
+    }
     return 0;
 }

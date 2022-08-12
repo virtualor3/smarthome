@@ -31,11 +31,12 @@ $(MODENAME):
 $(APPNAME):
 	@make -C $(PWD)/application all
 
+.PHONY = clean install
+
 install:
 	cp driver/$(MODENAME).ko	$(INSTALLDIR) 2> /dev/null
 	cp application/$(APPNAME)	$(INSTALLDIR) 2> /dev/null
 
-.PHONY:clean
 clean:
 	@make -C $(KERNELDIR)  M=$(PWD)/driver  clean
 	@make -C $(PWD)/application clean 2> /dev/null

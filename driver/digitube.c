@@ -45,6 +45,7 @@ static const u8 code[] = {
  0x5e, //d
  0x79, //e
  0x71, //f
+ 0x40, //-
 };
 
 static const u8 which[] = {
@@ -57,29 +58,38 @@ static const u8 which[] = {
 static struct digitubeinfo
 {
     uint8_t digitube_char[4];  //4位数码管数值
-    uint8_t decimal_places;     //数码管小数位数
+    uint8_t decimal_places;    //数码管小数点位置(0~3)
+    uint8_t neg;               //符号位 
 } digitube_info;
 
 void digitube_display(uint32_t num)
 {
     int i;
-    num = GET_DIGITNUM(num);
-
     spin_lock(&spin);
+    digitube_info.decimal_places = 3 - (GET_DIGITDEC(num) & 0x3);
+    digitube_info.neg = GET_DIGITNEG(num);
+
+    num = GET_DIGITNUM(num);
     for (i = 0; i < 4; i++) {
         digitube_info.digitube_char[3 - i] = num % 10;
         num /= 10;
     }
-    digitube_info.decimal_places = 3 - (GET_DIGITDEC(num) & 0x3);
     spin_unlock(&spin);
 }
 
 static void digitube_work_handler(struct work_struct* work)
 {
+    static uint8_t buf[2] = { 0 };
     static uint32_t i = 0;
-    uint8_t buf[] = { which[i], code[digitube_info.digitube_char[i]] };
-    if (i != 3 && digitube_info.decimal_places == i)
-        buf[1] |= 0x80;
+    spin_lock(&spin);
+    buf[0] = which[i];
+    if (i == 0 && digitube_info.neg != 0) {
+        buf[1] = code[16];
+    } else {
+        buf[1] = code[digitube_info.digitube_char[i]];
+    }
+    if (i != 3 && digitube_info.decimal_places == i) buf[1] |= 0x80;
+    spin_unlock(&spin);
     spi_write(digit_dev, buf, 2);
     i++;
     i &= 0x3;       //限制i的值在0~3
