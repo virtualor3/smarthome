@@ -23,9 +23,6 @@
 //只要实现smartdriver.h里的功能函数就行
 //头文件可以自行添加，自行添加的头文件是temphum.c的私有头文件
 //
-//
-//test
-//virtualor3 test.hahaha
 #include <linux/i2c.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -34,6 +31,22 @@
 #include "smartdriver.h"
 
 #define CNAME "si7006"
+
+// &i2c1{
+//     pinctrl-names = "default", "sleep";
+//     pinctrl-0 = <&i2c1_pins_b>;
+//     pinctrl-1 = <&i2c1_sleep_pins_b>;
+//     i2c-scl-rising-time-ns = <100>;
+//     i2c-scl-falling-time-ns = <7>;
+//     status = "okay";                                                                                              
+//     /delete-property/dmas;      //删除属性
+//     /delete-property/dma-names;
+    
+//     si7006@40{
+//         compatible = "yanyan,si7006";
+//         reg = <0x40>;
+//     };
+// };
 
 static struct i2c_client* gclient;
 static int temp_threshold;
