@@ -7,7 +7,7 @@
 #include "smartapp.h"
 #include "ui.h"
 
-#define DEVNAME "smarthome"
+#define DEVNAME "/dev/smarthome"
 
 typedef void (*pfunc_t)(int fd);
 

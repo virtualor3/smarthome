@@ -1,28 +1,28 @@
 /**
  * @file temphum.c
  * @author your name (you@domain.com)
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2022-08-10
- * 
+ *
  * @copyright Copyright (c) 2022
  */
 
 
-//温湿度
+ //温湿度
 
-//不要用注册file_operation
-/**
- * @brief: 不要使用module_xxx_driver
- * @example: 如果使用probe，可以用下面的形式
- * void xxx_init(void)
- * {
- *      platform_register_driver(...);
- * }
- */
-//只要实现smartdriver.h里的功能函数就行
-//头文件可以自行添加，自行添加的头文件是temphum.c的私有头文件
-//
+ //不要用注册file_operation
+ /**
+  * @brief: 不要使用module_xxx_driver
+  * @example: 如果使用probe，可以用下面的形式
+  * void xxx_init(void)
+  * {
+  *      platform_register_driver(...);
+  * }
+  */
+  //只要实现smartdriver.h里的功能函数就行
+  //头文件可以自行添加，自行添加的头文件是temphum.c的私有头文件
+  //
 #include <linux/i2c.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -41,7 +41,7 @@
 //     status = "okay";                                                                                              
 //     /delete-property/dmas;      //删除属性
 //     /delete-property/dma-names;
-    
+
 //     si7006@40{
 //         compatible = "yanyan,si7006";
 //         reg = <0x40>;
@@ -49,20 +49,38 @@
 // };
 
 static struct i2c_client* gclient;
-static int temp_threshold;
+static int temp_up_threshold = 65535;
+static int temp_down_threshold = 0;
 static spinlock_t lock;
 
-void set_temp_threshold(uint32_t buf)
+void set_temp_up_threshold(uint32_t buf)
 {
-    //临界区
-    spin_lock(&lock);
-    temp_threshold = buf;
-    spin_unlock(&lock);
+    temp_up_threshold = buf;
 }
 
-uint32_t get_temp_threshold(void)
+void set_temp_down_threshold(uint32_t buf)
 {
-    return temp_threshold;
+    temp_down_threshold = buf;
+}
+
+uint32_t get_temp_up_threshold(void)
+{
+    return temp_up_threshold;
+}
+
+uint32_t get_temp_down_threshold(void)
+{
+    return temp_down_threshold;
+}
+
+uint32_t get_temperature(void)
+{
+    return temperature;
+}
+
+uint32_t get_humidity(void)
+{
+    return humidity;
 }
 
 uint32_t read_temperature(void)
@@ -83,7 +101,7 @@ uint32_t read_temperature(void)
             .addr = gclient->addr,
             .flags = 1,
             .len = 2,
-            .buf =  (__u8 *)&data,
+            .buf = (__u8*)&data,
         },
     };
 
@@ -116,7 +134,7 @@ uint32_t read_temperature_humidity(void)
             .addr = gclient->addr,
             .flags = 1,
             .len = 4,
-            .buf =  (__u8 *)data,
+            .buf = (__u8*)data,
         },
     };
 
@@ -126,10 +144,7 @@ uint32_t read_temperature_humidity(void)
         printk("i2c read serial or firmware error\n");
         return -EAGAIN;
     }
-    data_return = 
-        (data[2] << 24) | (data[3] << 16) | 
-        (data[0] << 8 ) | (data[1] << 0 );  
-
+    data_return = (data[2] << 24) | (data[3] << 16) | (data[0] << 8) | (data[1] << 0);
     return data_return;
 }
 
@@ -138,7 +153,6 @@ uint32_t read_humidity(void)
     int ret;
     unsigned char r_buf[] = { HUM_ADDR };
     unsigned short data;
-
     // 1.封装消息
     struct i2c_msg r_msg[] = {
         [0] = {
@@ -151,7 +165,7 @@ uint32_t read_humidity(void)
             .addr = gclient->addr,
             .flags = 1,
             .len = 2,
-            .buf =  (__u8 *)&data,
+            .buf = (__u8*)&data,
         },
     };
 
@@ -168,12 +182,12 @@ uint32_t read_humidity(void)
 int si7006_probe(struct i2c_client* client, const struct i2c_device_id* id)
 {
     spin_lock_init(&lock);
+    gclient = client;
     return 0;
 }
 
 int si7006_remove(struct i2c_client* client)
 {
-    
     return 0;
 }
 

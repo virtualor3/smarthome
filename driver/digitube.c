@@ -21,7 +21,7 @@
 // };
 
 #define DIGIt_drv_NAME   "digit_drv"
-#define TIME_NSEC        2
+#define TIME_NSEC        10
 
 static struct spi_device* digit_dev;
 static struct work_struct digitube_work;
@@ -60,7 +60,7 @@ static struct digitubeinfo
     uint8_t digitube_char[4];  //4位数码管数值
     uint8_t decimal_places;    //数码管小数点位置(0~3)
     uint8_t neg;               //符号位 
-} digitube_info;
+} digitube_info = { 0 };
 
 void digitube_display(uint32_t num)
 {
@@ -79,7 +79,7 @@ void digitube_display(uint32_t num)
 
 static void digitube_work_handler(struct work_struct* work)
 {
-    static uint8_t buf[2] = { 0 };
+    uint8_t buf[2];
     static uint32_t i = 0;
     spin_lock(&spin);
     buf[0] = which[i];
@@ -90,7 +90,7 @@ static void digitube_work_handler(struct work_struct* work)
     }
     if (i != 3 && digitube_info.decimal_places == i) buf[1] |= 0x80;
     spin_unlock(&spin);
-    spi_write(digit_dev, buf, 2);
+    spi_write(digit_dev, buf, sizeof(buf));
     i++;
     i &= 0x3;       //限制i的值在0~3
 }
@@ -114,6 +114,7 @@ static int inline digit_drv_probe(struct spi_device* spi)
 
 static int inline digit_drv_remove(struct spi_device* spi)
 {
+    del_timer(&timer);
     return 0;
 }
 

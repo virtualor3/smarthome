@@ -146,28 +146,28 @@ void do_motor(int fd)
 
 void do_threshold(int fd)
 {
-    float num, new;
-    char buf[16] = { 0 };
-    num = 175.72 * ioctl(fd, IOW(IO_GET_TMP_THRESHOLD)) / 65536 - 46.85;
+    int ret;
+    float up, down;
+    up = 175.72 * ioctl(fd, IOW(IO_GET_TMP_UP_THRESHOLD)) / 65536 - 46.85;
+    down = 175.72 * ioctl(fd, IOW(IO_GET_TMP_DOWN_THRESHOLD)) / 65536 - 46.85;
     printf("\ec"THRESHOLD_MENU);
     while (1) {
-        printf("current temperature threshold is: %f\ninput>>", num);
-        fflush(stdout);
-        while (1) {
-            ign_return(fgets(buf, sizeof(buf), stdin));
-            if (buf[sizeof(buf) - 2] != '\n' && buf[sizeof(buf) - 2] != 0) {
-                while (getchar() != '\n');
-                buf[sizeof(buf) - 2] = 0;
-            }
-            if (buf[0] == 'q') return;
-            if (sscanf(buf, "%f", &new) == 1) break;
-            printf("请输入数字!\ninput>>");
-            fflush(stdout);
+        printf("current temperature threshold: up = %6.3f, down = %6.3f\n", up, down);
+        ret = get_inputi(1, 3, "input(1~3)>>");
+        if (ret == 1) {
+            up = get_inputf("enter temperature up threshold: ");
+            ret = ioctl(fd, IOW(IO_SET_TMP_UP_THRESHOLD), (uint32_t)((up + 46.85) * 65536 / 175.72));
+            goto Contine;
         }
-        if (0 == ioctl(fd, IOW(IO_SET_TMP_THRESHOLD), (uint32_t)((new + 46.85) * 65536 / 175.72))) {
+        if (ret == 2) {
+            down = get_inputf("enter temperature up threshold: ");
+            ret = ioctl(fd, IOW(IO_SET_TMP_DOWN_THRESHOLD), (uint32_t)((down + 46.85) * 65536 / 175.72));
+            goto Contine;
+        }
+        if (ret == 3) break;
+    Contine:
+        if (ret == 0) {
             printf("温度阈值设置成功!\n");
-            num = new;
-            continue;
         }
     }
 }

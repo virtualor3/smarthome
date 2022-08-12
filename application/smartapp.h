@@ -14,16 +14,30 @@
 #define get_inputi(min, max, format, args...)    ({  \
     int ret;    \
     char buf[16] = { 0 };    \
-    do{ \
+    do { \
         printf(format, ##args); \
         fflush(stdout); \
         ign_return(fgets(buf, sizeof(buf), stdin)); \
-        if(buf[sizeof(buf) - 2] != 0 && buf[sizeof(buf) - 2] != '\n') { \
+        if (buf[sizeof(buf) - 2] != 0 && buf[sizeof(buf) - 2] != '\n') { \
             while (getchar() != '\n'); \
             buf[sizeof(buf) -2] = 0;   \
         }   \
-        if(sscanf(buf, "%d", &ret) != 1) continue; \
-    } while (ret > max && ret < min);    \
+    } while ((sscanf(buf, "%d", &ret) != 1) || (ret > max && ret < min));    \
+    ret;    \
+})
+
+#define get_inputf(format, args...)     ({  \
+    float ret;  \
+    char buf[16] = { 0 };   \
+    do {    \
+        printf(format, ##args); \
+        fflush(stdout); \
+        ign_return(fgets(buf, sizeof(buf), stdin)); \
+        if (buf[sizeof(buf) - 2] != 0 && buf[sizeof(buf) - 2] != '\n') { \
+            while (getchar() != '\n'); \
+            buf[sizeof(buf) -2] = 0;   \
+        }   \
+    } while (sscanf(buf, "%f", &ret) != 1); \
     ret;    \
 })
 

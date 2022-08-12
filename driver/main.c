@@ -11,7 +11,6 @@
 struct cdev* cdev;
 struct class* cls;
 struct device* device;
-
 dev_t devno = MKDEV(0, 0);
 
 #define CNAME "smarthome"
@@ -46,13 +45,15 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
         return 0;
     }
     switch (_IOC_NR(cmd)) {
-        case IO_GET_TMP_THRESHOLD:  ret = get_temp_threshold(); break;
-        case IO_SET_TMP_THRESHOLD:  set_temp_threshold((uint32_t)arg); break;
-        case IO_GET_TMP:            ret = temperature; break;
-        case IO_GET_HUM:            ret = humidity; break;
-        case IO_GET_TMP_AND_HUM:    ret = SET_TEMPHUM(temperature, humidity); break;
-        case IO_SET_DIGITUBE:       digitube_display((uint32_t)arg); break;
-        default:                    printk("IOCTL cmdcode err!\n"); ret = -1;
+        case IO_SET_TMP_UP_THRESHOLD:   set_temp_up_threshold((uint32_t)arg); break;
+        case IO_GET_TMP_UP_THRESHOLD:   ret = get_temp_up_threshold(); break;
+        case IO_SET_TMP_DOWN_THRESHOLD: set_temp_down_threshold((uint32_t)arg); break;
+        case IO_GET_TMP_DOWN_THRESHOLD: ret = get_temp_down_threshold(); break;
+        case IO_GET_TMP:                ret = get_temperature(); break;
+        case IO_GET_HUM:                ret = get_humidity(); break;
+        case IO_GET_TMP_AND_HUM:        ret = SET_TEMPHUM(get_temperature(), get_humidity()); break;
+        case IO_SET_DIGITUBE:           digitube_display((uint32_t)arg); break;
+        default:                        printk("IOCTL cmdcode err!\n"); ret = -1;
     }
     return ret;
 }
@@ -77,10 +78,10 @@ struct file_operations fops = {
 
 static int __init smarthome_init(void)
 {
-    timer_init();
     pwm_init();
     temphum_init();
     digitube_init();
+    timer_init();
 
     cdev = cdev_alloc();
     cdev_init(cdev, &fops);

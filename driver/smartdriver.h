@@ -11,17 +11,15 @@
 #pragma once
 #include <linux/types.h>
 #include "ioprotocol.h"
-// typedef unsigned int uint32_t;
-//温湿度读取
-// return - uint32_t: 温度低16位、湿度高16位
-extern uint32_t read_temperature_humidity(void);
 //温度读取
-extern uint32_t read_temperature(void);
+extern uint32_t get_temperature(void);
 //湿度读取
-extern uint32_t read_humidity(void);
+extern uint32_t get_humidity(void);
 //温度阈值
-extern void inline set_temp_threshold(uint32_t);
-extern uint32_t inline get_temp_threshold(void);
+extern void inline set_temp_up_threshold(uint32_t);
+extern void inline set_temp_down_threshold(uint32_t);
+extern uint32_t inline get_temp_up_threshold(void);
+extern uint32_t inline get_temp_down_threshold(void);
 //LED
 extern void inline led_on(void);
 extern void inline led_off(void);
@@ -54,6 +52,3 @@ extern void inline temphum_delinit(void);
 extern void inline pwm_delinit(void);
 extern void inline digitube_delinit(void);
 extern void inline irq_delinit(void);
-
-extern uint32_t temperature;   //温度
-extern uint32_t humidity;      //湿度

@@ -6,7 +6,7 @@ export MODENAME ?= smarthome
 #开发板应用程序目标文件名<filename>.out
 export APPNAME ?= smarthomeapp
 #目标安装目录
-INSTALLDIR ?= ~/nfs/rootfs/
+INSTALLDIR ?= ~/nfs/rootfs/devtest
 #内核源码目录
 KERNELDIR ?= /home/virtualor3/linux-5.10.61
 
@@ -19,7 +19,7 @@ else
  	CROSS_COMPILE ?=
 endif
 
-CC := $(CROSS_COMPILE)gcc
+export APPCC := $(CROSS_COMPILE)gcc
 
 #全部编译
 all:driver app
@@ -37,8 +37,8 @@ $(APPNAME):
 .PHONY = clean install
 
 install:
-	cp driver/$(MODENAME).ko	$(INSTALLDIR) 2> /dev/null
-	cp application/$(APPNAME)	$(INSTALLDIR) 2> /dev/null
+	cp driver/$(MODENAME).ko	$(INSTALLDIR)
+	cp application/$(APPNAME)	$(INSTALLDIR)
 
 clean:
 	@make -C $(KERNELDIR)  M=$(PWD)/driver  clean

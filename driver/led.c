@@ -39,7 +39,6 @@
     compatible = "hqyj,myplatform";
     interrupt-parent = <&gpiof>;
     interrupts =<9 0>;
-    reg = <0x12345678 0x1E>;
     led1 = <&gpioe 10 0>;
     fan = <&gpioe 9 0>;
     buzz = <&gpiob 6 0>;
@@ -47,14 +46,13 @@
 };*/
 #define CNAME "led"
 #define PWM_PATH_NAME "/myplatform"
-static int status = 0;         // 电平切换
 static int irqno;              //中断号
 static char gpioname[] = "led1"; //设备树的键
 static struct device_node *node;
 static struct gpio_desc *desc;
 
 //按键中断
-irqreturn_t pwm_irq(int irq, void *dev)
+irqreturn_t key_irq(int irq, void *dev)
 {
     led_toggle();
     return IRQ_HANDLED;
@@ -70,9 +68,7 @@ void led_off(void)
 }
 void led_toggle(void)
 {
-    status = gpiod_get_value(desc);
-    status = !status;
-    gpiod_set_value(desc, status);
+    gpiod_set_value(desc, !gpiod_get_value(desc));
 }
 uint32_t led_status(void)
 {
@@ -84,7 +80,6 @@ uint32_t led_status(void)
 void led_init(void)
 {
     int ret;
-    printk("%s:%s:%d\n", __FILE__, __func__, __LINE__);
     // 1.获取结点
     node = of_find_node_by_path(PWM_PATH_NAME);
     if (node == NULL)
@@ -100,7 +95,7 @@ void led_init(void)
     {
         printk("get led error\n");
         ret = PTR_ERR(desc);
-        goto ERR2;
+        goto ERR1;
     }
     gpiod_set_value(desc, 0); // 保持低电平
 
@@ -109,19 +104,17 @@ void led_init(void)
     if (irqno == 0)
     {
         printk("parse irqno error\n");
-        goto ERR3;
+        goto ERR2;
     }
-    ret = request_irq(irqno, pwm_irq, IRQF_TRIGGER_FALLING, CNAME, NULL);
+    ret = request_irq(irqno, key_irq, IRQF_TRIGGER_FALLING, CNAME, NULL);
     if (ret)
     {
         printk("request irq error\n");
-        goto ERR4;
+        goto ERR3;
     }
     return;
-ERR4:
-    free_irq(irqno, NULL);
 ERR3:
-    gpiod_put(desc);
+    free_irq(irqno, NULL);
 ERR2:
     gpiod_put(desc);
 ERR1:
@@ -131,6 +124,5 @@ ERR1:
 void led_delinit(void)
 {
     free_irq(irqno, NULL);
-    gpiod_put(desc);
     gpiod_put(desc);
 }

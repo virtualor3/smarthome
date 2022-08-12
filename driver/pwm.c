@@ -103,7 +103,6 @@ uint32_t fan_status(void) //获取fan状态
 void pwm_init(void)
 {
     int ret, i = 0;
-    printk("%s:%s:%d\n", __FILE__, __func__, __LINE__);
     // 1.获取结点
     node = of_find_node_by_path(PWM_PATH_NAME);
     if (node == NULL) {

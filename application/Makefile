@@ -3,7 +3,7 @@ cflags := -Wall -O2 -I$(shell pwd)/..
 APPSOURCES := $(wildcard *.c)
 
 all:
-	$(CC) $(cflags) $(APPSOURCES) -o $(APPNAME)
+	$(APPCC) $(cflags) $(APPSOURCES) -o $(APPNAME)
 
 clean:
 	-@rm *.o $(APPNAME) 2> /dev/null
