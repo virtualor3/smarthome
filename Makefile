@@ -7,9 +7,12 @@ export MODENAME ?= smarthome
 export APPNAME ?= smarthomeapp
 #目标安装目录
 INSTALLDIR ?= ~/nfs/rootfs/
+#内核源码目录
+KERNELDIR ?= /home/virtualor3/linux-5.10.61
+
+DTBNAME ?= stm32mp157a-fsmp1a
 
 ifeq ($(ARCH),arm)
- 	KERNELDIR := /home/ubuntu/FSMP1A/linux/linux-5.10.61
 	CROSS_COMPILE ?= arm-linux-gnueabihf-
 else
  	KERNELDIR := /lib/modules/$(shell uname -r)/build
@@ -26,7 +29,7 @@ driver:$(MODENAME)
 app:$(APPNAME)
 
 $(MODENAME):
-	@make -C $(KERNELDIR)  M=$(PWD)/driver  modules
+	@make -C $(KERNELDIR)  M=$(PWD)/driver  $(MODENAME).ko
 
 $(APPNAME):
 	@make -C $(PWD)/application all

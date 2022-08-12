@@ -118,7 +118,7 @@ static int inline digit_drv_remove(struct spi_device* spi)
 }
 
 static struct of_device_id of_table[] = {
-    [0] = {.compatible = "hqyj,spi_m74hc595" },
+    [0] = {.compatible = "virtualor3,spi_m74hc595" },
     { /*END*/ },
 };
 MODULE_DEVICE_TABLE(of, of_table);
