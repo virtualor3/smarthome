@@ -7,6 +7,7 @@
 
 #include "smartdriver.h"
 #include "ioprotocol.h"
+#include "digitube.h"
 
 struct cdev* cdev;
 struct class* cls;
@@ -52,7 +53,10 @@ long smarthome_ioctl(struct file* filp, unsigned int cmd, unsigned long arg)
         case IO_GET_TMP:                ret = get_temperature(); break;
         case IO_GET_HUM:                ret = get_humidity(); break;
         case IO_GET_TMP_AND_HUM:        ret = SET_TEMPHUM(get_temperature(), get_humidity()); break;
-        case IO_SET_DIGITUBE:           digitube_display((uint32_t)arg); break;
+        case IO_DIGITUBE_TEMP:          set_digitube(DISPLAY_TEMP); break;
+        case IO_DIGITUBE_HUM:           set_digitube(DISPLAY_HUM); break;
+        case IO_DIGITUBE_TEMP_AND_HUM:  set_digitube(DISPLAY_TEMP_AND_HUM); break;
+        case IO_SET_DIGITUBE:           set_digitube(DISPLAY_NUMBER); digitube_display((uint32_t)arg); break;
         default:                        printk("IOCTL cmdcode err!\n"); ret = -1;
     }
     return ret;
@@ -78,6 +82,7 @@ struct file_operations fops = {
 
 static int __init smarthome_init(void)
 {
+    led_init();
     pwm_init();
     temphum_init();
     digitube_init();
@@ -103,6 +108,7 @@ static int __init smarthome_init(void)
 
 static void __exit smarthome_exit(void)
 {
+    led_delinit();
     timer_delinit();
     pwm_delinit();
     temphum_delinit();

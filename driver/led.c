@@ -47,7 +47,7 @@
 #define CNAME "led"
 #define PWM_PATH_NAME "/myplatform"
 static int irqno;              //中断号
-static char gpioname[] = "led1"; //设备树的键
+#define gpioname "led1" //设备树的键
 static struct device_node *node;
 static struct gpio_desc *desc;
 

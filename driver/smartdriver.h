@@ -38,17 +38,19 @@ extern void inline fan_start(void);
 extern void inline fan_stop(void);
 extern uint32_t inline fan_status(void);   //获取fan状态
 //数码管显示
-extern void inline digitube_display(uint32_t num);
+extern void inline set_digitube(uint32_t status);   //设置数码管显示状态
+extern void inline digitube_display(uint32_t num);  //设置数码管显示数字
 
 //初始化
 extern void inline timer_init(void);
 extern void inline temphum_init(void);
 extern void inline pwm_init(void);
 extern void inline digitube_init(void);
+extern void inline led_init(void);
 
 //卸载delinit
 extern void inline timer_delinit(void);
 extern void inline temphum_delinit(void);
 extern void inline pwm_delinit(void);
 extern void inline digitube_delinit(void);
-extern void inline irq_delinit(void);
+extern void inline led_delinit(void);

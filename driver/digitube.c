@@ -6,6 +6,7 @@
 #include <linux/workqueue.h>
 
 #include "smartdriver.h"
+#include "digitube.h"
 // &spi4{
 //     pinctrl-names = "default", "sleep";
 //     pinctrl-0 = <&spi4_pins_b>;
@@ -21,11 +22,11 @@
 // };
 
 #define DIGIt_drv_NAME   "digit_drv"
-#define TIME_NSEC        10
+#define TIME_NSEC        0
 
 static struct spi_device* digit_dev;
 static struct work_struct digitube_work;
-static struct timer_list timer;
+static struct timer_list digit_timer;
 static spinlock_t spin;
 
 static const u8 code[] = {
@@ -46,6 +47,7 @@ static const u8 code[] = {
  0x79, //e
  0x71, //f
  0x40, //-
+ 0x00, //(null)
 };
 
 static const u8 which[] = {
@@ -55,12 +57,12 @@ static const u8 which[] = {
  0x8, //sg3
 };
 
-static struct digitubeinfo
+struct digitube_info digitube_info = { 0 };
+
+void set_digitube(uint32_t status)
 {
-    uint8_t digitube_char[4];  //4位数码管数值
-    uint8_t decimal_places;    //数码管小数点位置(0~3)
-    uint8_t neg;               //符号位 
-} digitube_info = { 0 };
+    digitube_info.status = status;
+}
 
 void digitube_display(uint32_t num)
 {
@@ -87,8 +89,8 @@ static void digitube_work_handler(struct work_struct* work)
         buf[1] = code[16];
     } else {
         buf[1] = code[digitube_info.digitube_char[i]];
+        if (i != 3 && digitube_info.decimal_places == i) buf[1] |= 0x80;
     }
-    if (i != 3 && digitube_info.decimal_places == i) buf[1] |= 0x80;
     spin_unlock(&spin);
     spi_write(digit_dev, buf, sizeof(buf));
     i++;
@@ -98,23 +100,23 @@ static void digitube_work_handler(struct work_struct* work)
 static void timer_handler(struct timer_list* timer)
 {
     schedule_work(&digitube_work);
-    mod_timer(timer, jiffies + HZ * TIME_NSEC / 1000);
+    mod_timer(timer, jiffies + msecs_to_jiffies(TIME_NSEC));
 }
 
 static int inline digit_drv_probe(struct spi_device* spi)
 {
     spin_lock_init(&spin);
     INIT_WORK(&digitube_work, digitube_work_handler);
-    timer.expires = jiffies + HZ * TIME_NSEC / 1000;
-    timer_setup(&timer, timer_handler, 0);
-    add_timer(&timer);
+    digit_timer.expires = jiffies + msecs_to_jiffies(TIME_NSEC);
+    timer_setup(&digit_timer, timer_handler, 0);
+    add_timer(&digit_timer);
     digit_dev = spi;
     return 0;
 }
 
 static int inline digit_drv_remove(struct spi_device* spi)
 {
-    del_timer(&timer);
+    del_timer(&digit_timer);
     return 0;
 }
 

@@ -11,6 +11,7 @@
 
 void do_exit(int fd)
 {
+    ioctl(fd, IO_DIGITUBE_TEMP);
     close(fd);
     exit(EXIT_SUCCESS);
 }
@@ -95,23 +96,24 @@ void do_buzz(int fd)
 
 void do_temphum(int fd)
 {
-    int ret, num;
+    int ret;
+    uint32_t num;
     printf("\ec"TEMPHUM_MENU);
     while (1) {
         ret = get_inputi(1, 4, "input(1~4)>>");
         if (ret == 1) {
             num = ioctl(fd, IOW(IO_GET_TMP));
-            printf("temp = %f\n", 175.72 * GET_TEMP(num) / 65536 - 46.85);
+            printf("temp = %5.2f\n", 175.72 * num / 65536 - 46.85);
             continue;
         }
         if (ret == 2) {
             num = ioctl(fd, IOW(IO_GET_HUM));
-            printf("hum = %f\n", 125.0 * GET_HUM(num) / 65536 - 6);
+            printf("hum = %5.2f\n", 125.0 * num / 65536 - 6);
             continue;
         }
         if (ret == 3) {
             num = ioctl(fd, IOW(IO_GET_TMP_AND_HUM));
-            printf("temp = %f\thum = %f\n", 175.72 * GET_TEMP(num) / 65536 - 46.85, 125.0 * GET_HUM(num) / 65536 - 6);
+            printf("temp = %5.2f\thum = %5.2f\n", 175.72 * GET_TEMP(num) / 65536 - 46.85, 125.0 * GET_HUM(num) / 65536 - 6);
             continue;
         }
         if (ret == 4) break;
@@ -152,7 +154,7 @@ void do_threshold(int fd)
     down = 175.72 * ioctl(fd, IOW(IO_GET_TMP_DOWN_THRESHOLD)) / 65536 - 46.85;
     printf("\ec"THRESHOLD_MENU);
     while (1) {
-        printf("current temperature threshold: up = %6.3f, down = %6.3f\n", up, down);
+        printf("current temperature threshold: up = %5.2f, down = %5.2f\n", up, down);
         ret = get_inputi(1, 3, "input(1~3)>>");
         if (ret == 1) {
             up = get_inputf("enter temperature up threshold: ");
@@ -174,14 +176,12 @@ void do_threshold(int fd)
 
 void do_digitube(int fd)
 {
-    int ret, num, temp, hum;
+    int ret;
     printf("\ec"DIGITUBE_MENU);
     while (1) {
         ret = get_inputi(1, 5, "input(1~5)>>");
         if (ret == 1) {
-            num = ioctl(fd, IOW(IO_GET_TMP));
-            temp = (uint32_t)(175.72 * 100 * num / 65536 - 46.85 * 100);
-            if (0 == ioctl(fd, IOW(IO_SET_DIGITUBE), SET_DIGITNUM(0, temp, 2))) {
+            if (0 == ioctl(fd, IOW(IO_DIGITUBE_TEMP))) {
                 printf("温度显示成功!\n");
                 continue;
             }
@@ -189,9 +189,7 @@ void do_digitube(int fd)
             continue;
         }
         if (ret == 2) {
-            num = ioctl(fd, IOW(IO_GET_HUM));
-            hum = (uint32_t)(125 * 100 * num / 65536 - 600);
-            if (0 == ioctl(fd, IOW(IO_SET_DIGITUBE), SET_DIGITNUM(0, hum, 2))) {
+            if (0 == ioctl(fd, IOW(IO_DIGITUBE_HUM))) {
                 printf("湿度显示成功!\n");
                 continue;
             }
@@ -199,10 +197,7 @@ void do_digitube(int fd)
             continue;
         }
         if (ret == 3) {
-            num = ioctl(fd, IOW(IO_GET_TMP_AND_HUM));
-            temp = (uint32_t)(175.72 * GET_TEMP(num) / 65536 - 46.85);
-            hum = (uint32_t)(125 * GET_HUM(num) / 65536 - 6);
-            if (0 == ioctl(fd, IOW(IO_SET_DIGITUBE), SET_DIGITNUM(0, temp * 100 + hum, 0))) {
+            if (0 == ioctl(fd, IOW(IO_DIGITUBE_TEMP_AND_HUM))) {
                 printf("温湿度显示成功!\n");
                 continue;
             }
@@ -232,7 +227,10 @@ uint32_t get_digit(char* buf, uint32_t digits)
     if (buf[0] == '-') {
         digits--;
         neg = 1;
-    } else if (buf[0] == '+') buf++;
+        buf++;
+    } else if (buf[0] == '+') {
+        buf++;
+    }
     for (i = 0; buf[i] >= '0' && buf[i] <= '9'; i++) {
         num = num * 10 + buf[i] - '0';
     }

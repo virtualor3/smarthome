@@ -49,9 +49,12 @@
 // };
 
 static struct i2c_client* gclient;
+static spinlock_t lock;
+
 static int temp_up_threshold = 65535;
 static int temp_down_threshold = 0;
-static spinlock_t lock;
+uint32_t temperature;   //温度
+uint32_t humidity;      //湿度
 
 void set_temp_up_threshold(uint32_t buf)
 {
@@ -119,8 +122,7 @@ uint32_t read_temperature_humidity(void)
 {
     int ret;
     unsigned char r_buf[] = { TMP_ADDR };
-    unsigned char data[4];
-    unsigned int  data_return = 0;
+    unsigned short data[2];
 
     // 1.封装消息
     struct i2c_msg r_msg[] = {
@@ -144,8 +146,9 @@ uint32_t read_temperature_humidity(void)
         printk("i2c read serial or firmware error\n");
         return -EAGAIN;
     }
-    data_return = (data[2] << 24) | (data[3] << 16) | (data[0] << 8) | (data[1] << 0);
-    return data_return;
+    data[0] = (data[0] << 8) | (data[0] >> 8);
+    data[1] = (data[1] << 8) | (data[1] >> 8);
+    return *(uint32_t*)data;
 }
 
 uint32_t read_humidity(void)

@@ -38,7 +38,6 @@
     compatible = "hqyj,myplatform";
     interrupt-parent = <&gpiof>;
     interrupts =<9 0>;
-    reg = <0x12345678 0x1E>;
     led1 = <&gpioe 10 0>;
     fan = <&gpioe 9 0>;
     buzz = <&gpiob 6 0>;

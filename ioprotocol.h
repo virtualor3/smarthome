@@ -32,6 +32,9 @@ enum iocmd {
     IO_GET_TMP,                 //获取温度
     IO_GET_HUM,                 //获取湿度
     IO_GET_TMP_AND_HUM,         //获取温湿度
+    IO_DIGITUBE_TEMP,           //数码管显示温度
+    IO_DIGITUBE_HUM,            //数码管显示湿度
+    IO_DIGITUBE_TEMP_AND_HUM,   //数码管显示温湿度
     IO_SET_DIGITUBE,            //设置数码管显示数值
 };
 
