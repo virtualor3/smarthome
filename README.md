@@ -9,6 +9,7 @@ Smart home project based on stm32mp157aaa development board
 
 源码编译
 Makefile修改
+
 ![image](https://user-images.githubusercontent.com/89239712/184576021-6e4c33f7-51d6-4d3d-bdc0-9dee6187bb38.png)
 
 make ARCH=arm
